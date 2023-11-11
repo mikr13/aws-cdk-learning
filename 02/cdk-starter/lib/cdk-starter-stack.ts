@@ -22,6 +22,14 @@ export class CdkStarterStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // to provide parameters while deployment
+    const duration = new cdk.CfnParameter(this, "duration", {
+      default: 6,
+      minValue: 1,
+      maxValue: 10,
+      type: "Number", // always uppercase, ts types don't specify it.
+    });
+
     // create an s3 bucket 3 ways:
 
     // L1 construct
@@ -29,7 +37,7 @@ export class CdkStarterStack extends cdk.Stack {
       lifecycleConfiguration: {
         rules: [
           {
-            expirationInDays: 1,
+            expirationInDays: duration.valueAsNumber,
             status: "Enabled", // if we make errors in any configuration values, we'll see the error at the last step of deployment using cfn, that's why we use L2
           },
         ],
@@ -40,13 +48,13 @@ export class CdkStarterStack extends cdk.Stack {
     const L2Bucket = new Bucket(this, "MyL2Bucket", {
       lifecycleRules: [
         {
-          expiration: cdk.Duration.days(2),
+          expiration: cdk.Duration.days(duration.valueAsNumber),
         },
       ],
     });
 
     // L3 construct
-    new L3Bucket(this, "MyL3Bucket", cdk.Duration.days(2));
+    new L3Bucket(this, "MyL3Bucket", cdk.Duration.days(duration.valueAsNumber));
 
     // to print what constructs name will be created on cloudformation
     new cdk.CfnOutput(this, "MyL2BucketName", {
