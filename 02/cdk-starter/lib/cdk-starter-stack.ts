@@ -22,7 +22,7 @@ export class CdkStarterStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // to provide parameters while deployment
+    // to provide parameters while deployment, check notion for commands
     const duration = new cdk.CfnParameter(this, "duration", {
       default: 6,
       minValue: 1,
